@@ -19,8 +19,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include <stdio.h>
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -87,6 +91,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_SPI1_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -96,8 +102,28 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // lower CS
+
+		uint8_t txData[3] = {0x01, 0x80, 0x00}; // transmit 00000001 start; 1000 0000 single-end, d1-3 =0; whatever
+		uint8_t rxData[3] = {0};//receive, 1. null, 2.first 2 digits, 3. rest 8 digits
+
+		HAL_SPI_TransmitReceive(&hspi1, txData, rxData, 3, HAL_MAX_DELAY); // SPIreceive
+
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // lift up CS
+
+		uint16_t result = ((rxData[1] & 0x03) << 8) | rxData[2];
+
+		printf("ADC value = %d\n", result);
+
+		uint16_t PWM_counts = 1000 + result/1023*1000;
+
+		printf("PWM: %d\n", PWM_counts);
+
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PWM_counts);
+
 
     /* USER CODE BEGIN 3 */
+	  HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
