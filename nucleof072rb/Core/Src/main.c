@@ -113,7 +113,7 @@ int main(void)
 
 	  uint16_t result = ((rxData[1] & 0x03) << 8) | rxData[2];
 
-	  uint16_t PWM_counts = 1000 + result/1023*1000;
+	  uint16_t PWM_counts = 3200.0f + result/1023.0f*3200.0f;
 
 
 	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PWM_counts);
