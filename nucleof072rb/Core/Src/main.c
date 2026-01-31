@@ -23,8 +23,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include <stdio.h>
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -104,20 +102,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // lower CS
-
-
-		HAL_SPI_TransmitReceive(&hspi1, txData, rxData, 3, HAL_MAX_DELAY); // SPIreceive
-
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // lift up CS
-
-		uint16_t result = ((rxData[1] & 0x03) << 8) | rxData[2];
-
-		uint16_t PWM_counts = 1000 + result/1023*1000;
-
-
-		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PWM_counts);
-
 
     /* USER CODE BEGIN 3 */
 	  HAL_Delay(10);
